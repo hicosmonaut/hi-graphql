@@ -1,0 +1,17 @@
+query selectedContinent($code: ID!){
+  continent(code: $code){
+    name
+    code
+    countries{
+      name
+      code
+      capital
+      phone
+      emoji
+      emojiU
+      languages{
+        name
+      }
+    }
+  }
+}

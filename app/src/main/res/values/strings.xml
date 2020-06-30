@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">HiGraphQL</string>
+    <string name="template_name_continent">%name_continent%</string>
+    <string name="template_code_continent">%ZZ%</string>
+    <string name="template_number_of_countries">Countries: %1$d</string>
+</resources>

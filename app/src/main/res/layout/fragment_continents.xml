@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal"
+    android:baselineAligned="false">
+
+    <fragment
+        android:id="@+id/fragment_continents_fr_container_master_list"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:name="hi.cosmonaut.graphql.ui.fragment.ContinentListFragment"
+        tools:layout="@layout/fragment_list_continent"
+        />
+    <View
+        android:id="@+id/fragment_container_divider_vertical"
+        android:layout_width="1dp"
+        android:layout_height="match_parent"
+        android:background="#80000000"
+        />
+    <fragment
+        android:id="@+id/fragment_continents_fr_container_continent_content"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="2"
+        android:name="androidx.navigation.fragment.NavHostFragment"
+        app:navGraph="@navigation/continent_graph"
+        />
+
+
+</LinearLayout>
+</layout>
