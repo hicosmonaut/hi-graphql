@@ -3,71 +3,49 @@ package hi.cosmonaut.graphql.data.remote
 import android.util.Log
 import com.apollographql.apollo.ApolloCall
 import com.apollographql.apollo.ApolloClient
-import com.apollographql.apollo.ApolloQueryCall
 import com.apollographql.apollo.api.Response
-import com.apollographql.apollo.api.toJson
+import com.apollographql.apollo.coroutines.toDeferred
 import com.apollographql.apollo.exception.ApolloException
 import hi.cosmonaut.graphql.data.model.Continent
-import hi.cosmonaut.graphql.data.model.ContinentList
-import hi.cosmonaut.graphql.data.model.SelectedContinent
+import hi.cosmonaut.graphql.data.wrapper.Event
 import hi.cosmonaut.graphql.util.Constants
-import hi.cosmonaut.graphql.util.GsonUtils
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import query.ContinentsQuery
 import query.SelectedContinentQuery
 
-class NetworkManager(val callback: NetworkContract.ICallback) : NetworkContract.IContinent {
+class NetworkManager: NetworkContract.IContinent {
 
     //the first experience with GraphQL. Sorry for possible mistakes
     private val apolloClient = ApolloClient.builder()
         .serverUrl("https://countries.trevorblades.com")
         .build()
 
-    override fun getContinents() {
+    override suspend fun getContinents(): Event<Any> {
         if(Constants.LOGS_ENABLED) Log.d(TAG, "getContinents(): start")
-        execAsyncRequest(ContinentsQuery.Data::class.java) { apolloClient.query(ContinentsQuery()) }
+        return execAsyncRequest { apolloClient.query(ContinentsQuery()) }
     }
 
-    override fun getSelectedContinent(continent: Continent) {
+    override suspend fun getSelectedContinent(continent: Continent): Event<Any> {
         if(Constants.LOGS_ENABLED) Log.d(TAG, "getSelectedContinent(): start")
-        execAsyncRequest(SelectedContinentQuery.Data::class.java) { apolloClient.query(SelectedContinentQuery(continent.code)) }
+        return execAsyncRequest { apolloClient.query(SelectedContinentQuery(continent.code)) }
     }
 
-    //custom lamba for handling different types of response
-    private fun <T, C> execAsyncRequest(responseType: Class<C>, request: () -> ApolloQueryCall<T>){
-        request().enqueue(object : ApolloCall.Callback<T>(){
-            override fun onFailure(e: ApolloException) {
-                callback.onFailure(e)
-            }
+    //custom lambda for handling different types of response
+    private suspend fun <T> execAsyncRequest(request: () -> ApolloCall<T>) = withContext(Dispatchers.IO){
 
-            override fun onResponse(response: Response<T>) {
-                val data = response.data
-                if(Constants.LOGS_ENABLED) Log.d(TAG, "onResponse(): data: $data")
-                when{
-                    response.hasErrors() -> callback.onFailure(ApolloException("Response has errors"))
-                    data == null -> callback.onFailure(ApolloException("Response data is null"))
-                    else -> handleResponseData(data, responseType)
-                }
-            }
-        })
-    }
+        val deferredResult = request().toDeferred()
+        val response = deferredResult.await()
 
-    private fun <T, R> handleResponseData(data: T, responseType: Class<R>) {
-        when(responseType){
-            ContinentsQuery.Data::class.java -> dataAsContinentQueryData(data as ContinentsQuery.Data)
-            SelectedContinentQuery.Data::class.java -> dataAsSelectedQueryData(data as SelectedContinentQuery.Data)
-            else -> if(Constants.LOGS_ENABLED) Log.d(TAG, "handleResponseData(): else type: ${responseType.canonicalName}")
+        val data: T? = response.data
+        val errors = response.errors //todo: actions with errors, if needed
+
+        when{
+            response.hasErrors() -> Event.Error(null, "Response has errors", null)
+            data == null -> Event.Error(null, "Response data is null", null)
+            else -> Event.Success(data)
         }
-    }
 
-    private fun dataAsContinentQueryData(data: ContinentsQuery.Data) {
-        if(Constants.LOGS_ENABLED) Log.d(TAG, "dataAsContinentQueryData(): data: $data")
-        val result = GsonUtils.queryDataToModel(data.toJson(), ContinentList::class.java)
-        callback.onResponse(result)
-    }
-
-    private fun dataAsSelectedQueryData(data: SelectedContinentQuery.Data) {
-        val result = GsonUtils.queryDataToModel(data.toJson(), SelectedContinent::class.java)
-        callback.onResponse(result)
     }
 
     companion object{

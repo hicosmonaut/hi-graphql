@@ -7,7 +7,6 @@ import kotlinx.android.parcel.Parcelize
 
 @Parcelize
 data class Data(
-    @SerializedName("continents") val continents: List<Continent>,
-    @SerializedName("continent") val continent: Continent
-
+    @SerializedName("continents") var continents: List<Continent>? = mutableListOf(),
+    @SerializedName("continent") var continent: Continent? = null
 ) : Parcelable

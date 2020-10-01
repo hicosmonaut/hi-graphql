@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/item_country_tv_emoji"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:text="🇦🇴"
+            android:gravity="center"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            />
+
+        <TextView
+            android:id="@+id/item_country_tv_country_name"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:text="@string/template_country_with_code"
+            android:gravity="center_vertical"
+            app:layout_constraintTop_toTopOf="@id/item_country_tv_emoji"
+            app:layout_constraintBottom_toBottomOf="@id/item_country_tv_emoji"
+            app:layout_constraintStart_toEndOf="@id/item_country_tv_emoji"
+            app:layout_constraintEnd_toEndOf="parent"
+            />
+
+        <TextView
+            android:id="@+id/item_country_tv_country_info"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:maxLines="3"
+            android:text="@string/template_country_info"
+            app:layout_constraintStart_toEndOf="@id/item_country_tv_emoji"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/item_country_tv_country_name"
+            />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

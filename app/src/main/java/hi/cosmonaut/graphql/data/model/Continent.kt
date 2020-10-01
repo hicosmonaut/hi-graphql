@@ -8,7 +8,7 @@ import kotlinx.android.parcel.Parcelize
 @Parcelize
 data class Continent(
     @SerializedName("code") val code: String,
-    @SerializedName("__typename") val type: String,
-    @SerializedName("countries") val countries: List<Country>,
-    @SerializedName("name") val name: String
+    @SerializedName("__typename") val type: String? = null,
+    @SerializedName("countries") val countries: List<Country>? = mutableListOf(),
+    @SerializedName("name") val name: String? = null
 ) : Parcelable

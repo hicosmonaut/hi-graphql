@@ -1,10 +1,11 @@
-package hi.cosmonaut.graphql.ui.fragment
+package hi.cosmonaut.graphql.ui.fragment.home
 
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -16,10 +17,12 @@ import androidx.navigation.fragment.findNavController
 import hi.cosmonaut.graphql.R
 import hi.cosmonaut.graphql.data.model.SelectedContinent
 import hi.cosmonaut.graphql.databinding.FragmentContinentsBinding
-import hi.cosmonaut.graphql.viewmodel.ContinentsViewModel
+import hi.cosmonaut.graphql.ui.fragment.continent.content.ContinentContentFragmentDirections
 import hi.cosmonaut.graphql.util.Constants
 
-class ContinentsFragment: Fragment(){
+class HomeFragment: Fragment(){
+    private val viewModel by activityViewModels<HomeViewModel>()
+
     //binding
     private lateinit var binding: FragmentContinentsBinding
 
@@ -29,7 +32,7 @@ class ContinentsFragment: Fragment(){
 
     //viewmodel components
     private lateinit var selectedContinentObserver: Observer<SelectedContinent>
-    private val viewModel by activityViewModels<ContinentsViewModel>()
+    private lateinit var messageObserver: Observer<String>
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_continents, container, false)
@@ -37,13 +40,18 @@ class ContinentsFragment: Fragment(){
         return binding.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        init()
+    override fun onStart() {
+        super.onStart()
+        startObserve()
     }
 
-    private fun init(){
-        initViewModelComponents()
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        initComponents()
+    }
+
+    private fun initComponents(){
+        initObservers()
         initNavigationComponents()
 
         //put your other init methods below...
@@ -54,11 +62,23 @@ class ContinentsFragment: Fragment(){
         navControllerContentContinentFragment = Navigation.findNavController(navHostContentContinentFragment)
     }
 
-    private fun initViewModelComponents() {
+    private fun initObservers() {
         selectedContinentObserver = Observer {
             it?.let{
                 moveToSelectedContinent(it)
             }
+        }
+
+        messageObserver = Observer {
+            it?.let{message ->
+                showMessage(message)
+            }
+        }
+    }
+
+    private fun showMessage(message: String) {
+        requireContext().let{
+            Toast.makeText(it, message, Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -83,12 +103,12 @@ class ContinentsFragment: Fragment(){
     override fun onResume() {
         super.onResume()
         if(Constants.LOGS_ENABLED) Log.d(TAG, "onResume(): start")
-        startObserve()
     }
 
     private fun startObserve() {
         if(Constants.LOGS_ENABLED) Log.d(TAG, "startObserve(): start")
-        viewModel.getSelectedContinent().observeForever( selectedContinentObserver)
+        viewModel.selectedContinentData.observe(this, selectedContinentObserver)
+        viewModel.messageData.observe(this, messageObserver)
     }
 
     override fun onPause() {
@@ -106,6 +126,6 @@ class ContinentsFragment: Fragment(){
         if(Constants.LOGS_ENABLED) Log.d(TAG, "onDestroyView(): start")
     }
     companion object{
-        private val TAG: String = ContinentsFragment::class.java.simpleName
+        private val TAG: String = HomeFragment::class.java.simpleName
     }
 }

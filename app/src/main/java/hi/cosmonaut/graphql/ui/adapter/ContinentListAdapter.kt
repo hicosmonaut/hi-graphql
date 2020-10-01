@@ -9,14 +9,14 @@ import hi.cosmonaut.graphql.R
 import hi.cosmonaut.graphql.data.model.Continent
 import hi.cosmonaut.graphql.data.model.ContinentList
 import hi.cosmonaut.graphql.databinding.ItemContinentBinding
-import hi.cosmonaut.graphql.viewmodel.ContinentsViewModel
+import hi.cosmonaut.graphql.ui.fragment.home.HomeViewModel
 
 
 class ContinentListAdapter: RecyclerView.Adapter<ContinentListAdapter.ViewHolder>() {
 
     private lateinit var context: Context
-    private lateinit var continents: List<Continent>
-    private lateinit var viewModel: ContinentsViewModel
+    private var continents: List<Continent> = mutableListOf()
+    private lateinit var viewModel: HomeViewModel
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         context = parent.context
@@ -25,16 +25,16 @@ class ContinentListAdapter: RecyclerView.Adapter<ContinentListAdapter.ViewHolder
         return ViewHolder(binding)
     }
 
-    fun setContinentList(continentList: ContinentList) {
-        this.continents = continentList.data.continents
+    fun setContinentList(continentList: List<Continent>) {
+        this.continents = continentList
         notifyDataSetChanged()
     }
 
-    fun setViewModel(viewModel: ContinentsViewModel) {
+    fun setViewModel(viewModel: HomeViewModel) {
         this.viewModel = viewModel
     }
 
-    override fun getItemCount(): Int = if(::continents.isInitialized) continents.size else 0
+    override fun getItemCount(): Int = continents.size
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = continents.elementAt(position)
@@ -56,7 +56,7 @@ class ContinentListAdapter: RecyclerView.Adapter<ContinentListAdapter.ViewHolder
                 //fill data
                 itemContinentTvName.text = item.name
                 itemContinentTvCode.text = item.code
-                itemContinentTvNumberOfCountries.text = context.getString(R.string.template_number_of_countries, item.countries.size)
+                itemContinentTvNumberOfCountries.text = context.getString(R.string.template_number_of_countries, item.countries?.size )
 
                 //root click listener, user selects continent
                 root.setOnClickListener {

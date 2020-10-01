@@ -8,10 +8,7 @@ query selectedContinent($code: ID!){
       capital
       phone
       emoji
-      emojiU
-      languages{
-        name
-      }
+      currency
     }
   }
 }

@@ -3,4 +3,7 @@
     <string name="template_name_continent">%name_continent%</string>
     <string name="template_code_continent">%ZZ%</string>
     <string name="template_number_of_countries">Countries: %1$d</string>
+    <string name="template_emoji">%emoji%</string>
+    <string name="template_country_with_code">%1$s (%2$s)</string>
+    <string name="template_country_info">%1$s</string>
 </resources>
