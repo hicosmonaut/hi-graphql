@@ -1,7 +1,7 @@
 # hi-graphql
 This mini-project is for GraphQL experience
 
-ЗАДАНИЕ GraphQL
+# GraphQL
 Необходимо создать приложение, используя ​https://github.com/trevorblades/countries
 для получения информации о континентах и странах.
 
